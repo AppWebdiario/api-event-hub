@@ -1,0 +1,83 @@
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### Logs ###
+*.log
+logs/
+
+### OS Generated Files ###
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+### Application Properties ###
+# Local and development configurations (safe to commit)
+# application-local.yml
+# application-sandbox.yml
+
+# Production configurations (NEVER commit!)
+application-production.yml
+application-prod.yml
+application-test.yml
+
+# Environment-specific configuration files
+application-*.yml
+!application-local.yml
+!application-sandbox.yml
+
+# Sensitive configuration files
+config/application-*.yml
+config/application-*.properties
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.staging
+
+# Keep example file
+!env.example
+
+### Database ###
+*.db
+*.sqlite
+*.sqlite3
+
+### Maven ###
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.properties

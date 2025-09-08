@@ -1,0 +1,87 @@
+server:
+  port: 8082
+  servlet:
+    context-path: /api/event-hub
+
+spring:
+  application:
+    name: webdiario-event-hub
+  
+  profiles:
+    active: local
+  
+  datasource:
+    url: ${DATABASE_URL:jdbc:mysql://localhost:3306/webdiario_event_hub?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+    username: ${DATABASE_USERNAME:root}
+    password: ${DATABASE_PASSWORD:root}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+        
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    contexts: dev
+    default-schema: webdiario_event_hub
+
+# AWS Configuration
+aws:
+  region: ${AWS_REGION:us-east-1}
+  access-key: ${AWS_ACCESS_KEY:}
+  secret-key: ${AWS_SECRET_KEY:}
+  sqs:
+    endpoint: ${AWS_SQS_ENDPOINT:http://localhost:4566}
+    queues:
+      user-events: ${AWS_SQS_USER_EVENTS_QUEUE:webdiario-user-events}
+      system-events: ${AWS_SQS_SYSTEM_EVENTS_QUEUE:webdiario-system-events}
+      notification-events: ${AWS_SQS_NOTIFICATION_EVENTS_QUEUE:webdiario-notification-events}
+  sns:
+    endpoint: ${AWS_SNS_ENDPOINT:http://localhost:4566}
+    topics:
+      user-notifications: ${AWS_SNS_USER_NOTIFICATIONS_TOPIC:webdiario-user-notifications}
+      system-alerts: ${AWS_SNS_SYSTEM_ALERTS_TOPIC:webdiario-system-alerts}
+      audit-logs: ${AWS_SNS_AUDIT_LOGS_TOPIC:webdiario-audit-logs}
+
+# Event Hub Configuration
+event-hub:
+  batch-size: ${EVENT_HUB_BATCH_SIZE:100}
+  retry-attempts: ${EVENT_HUB_RETRY_ATTEMPTS:3}
+  retry-delay: ${EVENT_HUB_RETRY_DELAY:1000}
+  dead-letter-queue: ${EVENT_HUB_DEAD_LETTER_QUEUE:webdiario-dlq}
+  event-retention-days: ${EVENT_HUB_EVENT_RETENTION_DAYS:90}
+  max-event-size: ${EVENT_HUB_MAX_EVENT_SIZE:1048576}  # 1MB
+
+# Logging Configuration
+logging:
+  level:
+    com.webdiario.eventhub: ${LOGGING_LEVEL_APP:DEBUG}
+    org.springframework.cloud.aws: ${LOGGING_LEVEL_AWS:DEBUG}
+    software.amazon.awssdk: ${LOGGING_LEVEL_AWS_SDK:DEBUG}
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# OpenAPI Configuration
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+  packages-to-scan: com.webdiario.eventhub.controller
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,events
+  endpoint:
+    health:
+      show-details: always

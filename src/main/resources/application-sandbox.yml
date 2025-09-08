@@ -1,0 +1,61 @@
+# Sandbox Environment Configuration
+# This file contains sandbox/test environment settings for Event Hub
+
+spring:
+  profiles:
+    active: sandbox
+  
+  datasource:
+    url: ${DATABASE_URL:jdbc:mysql://sandbox-db.example.com:3306/webdiario_event_hub_sandbox?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+    username: ${DATABASE_USERNAME:sandbox_user}
+    password: ${DATABASE_PASSWORD:sandbox_password}
+
+server:
+  port: 8082
+  servlet:
+    context-path: /api/event-hub
+
+# AWS Configuration - Sandbox Environment
+aws:
+  region: ${AWS_REGION:us-east-1}
+  access-key: ${AWS_ACCESS_KEY:}
+  secret-key: ${AWS_SECRET_KEY:}
+  sqs:
+    endpoint: ${AWS_SQS_ENDPOINT:https://sqs.us-east-1.amazonaws.com}
+    queues:
+      user-events: ${AWS_SQS_USER_EVENTS_QUEUE:webdiario-user-events-sandbox}
+      system-events: ${AWS_SQS_SYSTEM_EVENTS_QUEUE:webdiario-system-events-sandbox}
+      notification-events: ${AWS_SQS_NOTIFICATION_EVENTS_QUEUE:webdiario-notification-events-sandbox}
+  sns:
+    endpoint: ${AWS_SNS_ENDPOINT:https://sns.us-east-1.amazonaws.com}
+    topics:
+      user-notifications: ${AWS_SNS_USER_NOTIFICATIONS_TOPIC:webdiario-user-notifications-sandbox}
+      system-alerts: ${AWS_SNS_SYSTEM_ALERTS_TOPIC:webdiario-system-alerts-sandbox}
+      audit-logs: ${AWS_SNS_AUDIT_LOGS_TOPIC:webdiario-audit-logs-sandbox}
+
+# Event Hub Configuration - Sandbox Environment
+event-hub:
+  batch-size: ${EVENT_HUB_BATCH_SIZE:100}
+  retry-attempts: ${EVENT_HUB_RETRY_ATTEMPTS:3}
+  retry-delay: ${EVENT_HUB_RETRY_DELAY:1000}
+  dead-letter-queue: ${EVENT_HUB_DEAD_LETTER_QUEUE:webdiario-dlq-sandbox}
+  event-retention-days: ${EVENT_HUB_EVENT_RETENTION_DAYS:30}
+  max-event-size: ${EVENT_HUB_MAX_EVENT_SIZE:1048576}  # 1MB
+
+# Logging Configuration - Sandbox Environment
+logging:
+  level:
+    com.webdiario.eventhub: INFO
+    org.springframework.cloud.aws: INFO
+    software.amazon.awssdk: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# Additional Sandbox Settings
+app:
+  environment: sandbox
+  debug: false
+  cors:
+    allowed-origins: https://sandbox-app.example.com,https://sandbox-admin.example.com
+    allowed-methods: GET,POST,PUT,DELETE,PATCH,OPTIONS
+    allowed-headers: "*"
