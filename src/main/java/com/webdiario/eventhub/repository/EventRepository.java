@@ -28,11 +28,11 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     
     List<Event> findByPriority(Event.EventPriority priority);
     
-    List<Evento> findByUserId(String userId);
+    List<Event> findByUserId(String userId);
     
-    List<Evento> findByTenantId(String tenantId);
+    List<Event> findByTenantId(String tenantId);
     
-    List<Evento> findByCorrelationId(String correlationId);
+    List<Event> findByCorrelationId(String correlationId);
     
     List<Event> findByEventTimestampBetween(LocalDateTime start, LocalDateTime end);
     

@@ -2,7 +2,7 @@
 -- This script creates default JSON schemas for common event types
 
 -- User Created Event Schema
-INSERT INTO event_schemas (tipo_evento, versao, schema_json, descricao, ativo, tags, required_fields, optional_fields, created_by) VALUES
+INSERT INTO event_schemas (event_type, version, schema_json, description, active, tags, required_fields, optional_fields, created_by) VALUES
 ('USER_CREATED', '1.0', 
 '{
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -65,7 +65,7 @@ TRUE,
 'system');
 
 -- User Updated Event Schema
-INSERT INTO event_schemas (tipo_evento, versao, schema_json, descricao, ativo, tags, required_fields, optional_fields, created_by) VALUES
+INSERT INTO event_schemas (event_type, version, schema_json, description, active, tags, required_fields, optional_fields, created_by) VALUES
 ('USER_UPDATED', '1.0', 
 '{
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -118,7 +118,7 @@ TRUE,
 'system');
 
 -- User Login Event Schema
-INSERT INTO event_schemas (tipo_evento, versao, schema_json, descricao, ativo, tags, required_fields, optional_fields, created_by) VALUES
+INSERT INTO event_schemas (event_type, version, schema_json, description, active, tags, required_fields, optional_fields, created_by) VALUES
 ('USER_LOGIN', '1.0', 
 '{
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -177,7 +177,7 @@ TRUE,
 'system');
 
 -- System Alert Event Schema
-INSERT INTO event_schemas (tipo_evento, versao, schema_json, descricao, ativo, tags, required_fields, optional_fields, created_by) VALUES
+INSERT INTO event_schemas (event_type, version, schema_json, description, active, tags, required_fields, optional_fields, created_by) VALUES
 ('SYSTEM_ALERT', '1.0', 
 '{
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -260,7 +260,7 @@ TRUE,
 'system');
 
 -- Data Change Event Schema
-INSERT INTO event_schemas (tipo_evento, versao, schema_json, descricao, ativo, tags, required_fields, optional_fields, created_by) VALUES
+INSERT INTO event_schemas (event_type, version, schema_json, description, active, tags, required_fields, optional_fields, created_by) VALUES
 ('DATA_CHANGE', '1.0', 
 '{
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -344,7 +344,7 @@ TRUE,
 'system');
 
 -- API Access Event Schema
-INSERT INTO event_schemas (tipo_evento, versao, schema_json, descricao, ativo, tags, required_fields, optional_fields, created_by) VALUES
+INSERT INTO event_schemas (event_type, version, schema_json, description, active, tags, required_fields, optional_fields, created_by) VALUES
 ('API_ACCESS', '1.0', 
 '{
   "$schema": "http://json-schema.org/draft-07/schema#",

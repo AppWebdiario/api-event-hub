@@ -21,17 +21,17 @@ public class EventSchemaCreateRequest {
 
     @NotBlank(message = "Event type is required")
     @Size(max = 100, message = "Event type must not exceed 100 characters")
-    private String tipoEvento;
+    private String eventType;
 
     @NotBlank(message = "Event version is required")
     @Size(max = 20, message = "Event version must not exceed 20 characters")
-    private String versao;
+    private String version;
 
     @NotBlank(message = "Schema JSON is required")
     private String schemaJson;
 
     @Size(max = 500, message = "Description must not exceed 500 characters")
-    private String descricao;
+    private String description;
 
     private Boolean active;
 

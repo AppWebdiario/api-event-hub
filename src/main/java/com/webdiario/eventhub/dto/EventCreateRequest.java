@@ -22,18 +22,18 @@ public class EventCreateRequest {
 
     @NotBlank(message = "Event type is required")
     @Size(max = 100, message = "Event type must not exceed 100 characters")
-    private String tipoEvento;
+    private String eventType;
 
     @NotBlank(message = "Event source is required")
     @Size(max = 100, message = "Event source must not exceed 100 characters")
-    private String origem;
+    private String source;
 
     @NotBlank(message = "Event version is required")
     @Size(max = 20, message = "Event version must not exceed 20 characters")
-    private String versao;
+    private String version;
 
     @NotNull(message = "Event timestamp is required")
-    private LocalDateTime timestampEvento;
+    private LocalDateTime eventTimestamp;
 
     @Size(max = 100, message = "Correlation ID must not exceed 100 characters")
     private String correlationId;
@@ -50,7 +50,7 @@ public class EventCreateRequest {
     @Size(max = 20, message = "Schema version must not exceed 20 characters")
     private String schemaVersion;
 
-    private EventPriority prioridade;
+    private EventPriority priority;
 
     @Size(max = 500, message = "Tags must not exceed 500 characters")
     private String tags;

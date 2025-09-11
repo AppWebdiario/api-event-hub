@@ -25,19 +25,19 @@ public class EventSchema {
     private Long id;
 
     @NotBlank(message = "Event type is required")
-    @Column(name = "tipo_evento", nullable = false, length = 100)
-    private String tipoEvento;
+    @Column(name = "event_type", nullable = false, length = 100)
+    private String eventType;
 
     @NotBlank(message = "Event version is required")
-    @Column(name = "versao", nullable = false, length = 20)
-    private String versao;
+    @Column(name = "version", nullable = false, length = 20)
+    private String version;
 
     @NotBlank(message = "Schema content is required")
     @Column(name = "schema_json", columnDefinition = "JSON", nullable = false)
     private String schemaJson;
 
-    @Column(name = "descricao", length = 500)
-    private String descricao;
+    @Column(name = "description", length = 500)
+    private String description;
 
     @Column(name = "active", nullable = false)
     @Builder.Default
@@ -96,16 +96,16 @@ public class EventSchema {
     @Column(name = "updated_by", length = 100)
     private String updatedBy;
 
-    @Column(name = "data_criacao", nullable = false)
+    @Column(name = "created_at", nullable = false)
     @Builder.Default
-    private LocalDateTime dataCriacao = LocalDateTime.now();
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Column(name = "data_atualizacao")
-    private LocalDateTime dataAtualizacao;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @PreUpdate
     protected void onUpdate() {
-        this.dataAtualizacao = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
     // Helper methods
@@ -119,6 +119,6 @@ public class EventSchema {
     }
 
     public String getFullVersion() {
-        return tipoEvento + "-" + versao;
+        return eventType + "-" + version;
     }
 }

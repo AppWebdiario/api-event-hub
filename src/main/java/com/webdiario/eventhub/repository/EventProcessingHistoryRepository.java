@@ -1,7 +1,7 @@
 package com.webdiario.eventhub.repository;
 
 import com.webdiario.eventhub.entity.EventProcessingHistory;
-import com.webdiario.eventhub.entity.Evento;
+import com.webdiario.eventhub.entity.Event;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,9 +16,9 @@ import java.util.List;
 @Repository
 public interface EventProcessingHistoryRepository extends JpaRepository<EventProcessingHistory, Long> {
 
-    List<EventProcessingHistory> findByEvento(Evento evento);
+    List<EventProcessingHistory> findByEvent(Event event);
     
-    List<EventProcessingHistory> findByEventoOrderByAttemptNumberDesc(Evento evento);
+    List<EventProcessingHistory> findByEventOrderByAttemptNumberDesc(Event event);
     
     List<EventProcessingHistory> findByStatus(EventProcessingHistory.ProcessingStatus status);
     
@@ -50,22 +50,22 @@ public interface EventProcessingHistoryRepository extends JpaRepository<EventPro
     
     List<EventProcessingHistory> findBySpanId(String spanId);
     
-    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.evento.id = :eventoId ORDER BY eph.attemptNumber DESC")
-    List<EventProcessingHistory> findByEventoIdOrderByAttemptNumberDesc(@Param("eventoId") Long eventoId);
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.event.id = :eventId ORDER BY eph.attemptNumber DESC")
+    List<EventProcessingHistory> findByEventIdOrderByAttemptNumberDesc(@Param("eventId") Long eventId);
     
-    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.evento.eventId = :eventId ORDER BY eph.attemptNumber DESC")
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.event.eventId = :eventId ORDER BY eph.attemptNumber DESC")
     List<EventProcessingHistory> findByEventIdOrderByAttemptNumberDesc(@Param("eventId") String eventId);
     
-    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.evento.tipoEvento = :tipoEvento")
-    List<EventProcessingHistory> findByTipoEvento(@Param("tipoEvento") String tipoEvento);
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.event.eventType = :eventType")
+    List<EventProcessingHistory> findByEventType(@Param("eventType") String eventType);
     
-    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.evento.origem = :origem")
-    List<EventProcessingHistory> findByOrigem(@Param("origem") String origem);
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.event.source = :source")
+    List<EventProcessingHistory> findBySource(@Param("source") String source);
     
-    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.evento.userId = :userId")
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.event.userId = :userId")
     List<EventProcessingHistory> findByUserId(@Param("userId") String userId);
     
-    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.evento.tenantId = :tenantId")
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.event.tenantId = :tenantId")
     List<EventProcessingHistory> findByTenantId(@Param("tenantId") String tenantId);
     
     @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.errorMessage LIKE %:errorPattern%")
@@ -98,69 +98,69 @@ public interface EventProcessingHistoryRepository extends JpaRepository<EventPro
     @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.outputPayloadHash = :hash")
     List<EventProcessingHistory> findByOutputPayloadHash(@Param("hash") String hash);
     
-    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.evento.id = :eventoId AND eph.status = :status")
-    List<EventProcessingHistory> findByEventoIdAndStatus(@Param("eventoId") Long eventoId, @Param("status") EventProcessingHistory.ProcessingStatus status);
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.event.id = :eventId AND eph.status = :status")
+    List<EventProcessingHistory> findByEventIdAndStatus(@Param("eventId") Long eventId, @Param("status") EventProcessingHistory.ProcessingStatus status);
     
-    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.evento.id = :eventoId AND eph.attemptNumber = :attemptNumber")
-    EventProcessingHistory findByEventoIdAndAttemptNumber(@Param("eventoId") Long eventoId, @Param("attemptNumber") Integer attemptNumber);
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.event.id = :eventId AND eph.attemptNumber = :attemptNumber")
+    EventProcessingHistory findByEventIdAndAttemptNumber(@Param("eventId") Long eventId, @Param("attemptNumber") Integer attemptNumber);
     
-    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.evento.id = :eventoId AND eph.status = 'SUCCESS'")
-    EventProcessingHistory findSuccessfulProcessingByEventoId(@Param("eventoId") Long eventoId);
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.event.id = :eventId AND eph.status = 'SUCCESS'")
+    EventProcessingHistory findSuccessfulProcessingByEventId(@Param("eventId") Long eventId);
     
-    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.evento.id = :eventoId AND eph.status = 'FAILED' ORDER BY eph.attemptNumber DESC")
-    List<EventProcessingHistory> findFailedProcessingsByEventoId(@Param("eventoId") Long eventoId);
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.event.id = :eventId AND eph.status = 'FAILED' ORDER BY eph.attemptNumber DESC")
+    List<EventProcessingHistory> findFailedProcessingsByEventId(@Param("eventId") Long eventId);
     
-    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.evento.id = :eventoId AND eph.status = 'RETRY'")
-    List<EventProcessingHistory> findRetryProcessingsByEventoId(@Param("eventoId") Long eventoId);
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.event.id = :eventId AND eph.status = 'RETRY'")
+    List<EventProcessingHistory> findRetryProcessingsByEventId(@Param("eventId") Long eventId);
     
-    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.evento.id = :eventoId AND eph.status = 'TIMEOUT'")
-    List<EventProcessingHistory> findTimeoutProcessingsByEventoId(@Param("eventoId") Long eventoId);
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.event.id = :eventId AND eph.status = 'TIMEOUT'")
+    List<EventProcessingHistory> findTimeoutProcessingsByEventId(@Param("eventId") Long eventId);
     
-    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.evento.id = :eventoId AND eph.status = 'CANCELLED'")
-    List<EventProcessingHistory> findCancelledProcessingsByEventoId(@Param("eventoId") Long eventoId);
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.event.id = :eventId AND eph.status = 'CANCELLED'")
+    List<EventProcessingHistory> findCancelledProcessingsByEventId(@Param("eventId") Long eventId);
     
-    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.evento.id = :eventoId AND eph.status = 'STARTED'")
-    List<EventProcessingHistory> findStartedProcessingsByEventoId(@Param("eventoId") Long eventoId);
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.event.id = :eventId AND eph.status = 'STARTED'")
+    List<EventProcessingHistory> findStartedProcessingsByEventId(@Param("eventId") Long eventId);
     
-    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.evento.id = :eventoId AND eph.status = 'PROCESSING'")
-    List<EventProcessingHistory> findProcessingByEventoId(@Param("eventoId") Long eventoId);
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.event.id = :eventId AND eph.status = 'PROCESSING'")
+    List<EventProcessingHistory> findProcessingByEventId(@Param("eventId") Long eventId);
     
-    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.evento.id = :eventoId ORDER BY eph.processingStart DESC")
-    List<EventProcessingHistory> findByEventoIdOrderByProcessingStartDesc(@Param("eventoId") Long eventoId);
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.event.id = :eventId ORDER BY eph.processingStart DESC")
+    List<EventProcessingHistory> findByEventIdOrderByProcessingStartDesc(@Param("eventId") Long eventId);
     
-    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.evento.id = :eventoId ORDER BY eph.processingEnd DESC")
-    List<EventProcessingHistory> findByEventoIdOrderByProcessingEndDesc(@Param("eventoId") Long eventoId);
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.event.id = :eventId ORDER BY eph.processingEnd DESC")
+    List<EventProcessingHistory> findByEventIdOrderByProcessingEndDesc(@Param("eventId") Long eventId);
     
-    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.evento.id = :eventoId ORDER BY eph.durationMs DESC")
-    List<EventProcessingHistory> findByEventoIdOrderByDurationDesc(@Param("eventoId") Long eventoId);
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.event.id = :eventId ORDER BY eph.durationMs DESC")
+    List<EventProcessingHistory> findByEventIdOrderByDurationDesc(@Param("eventId") Long eventId);
     
-    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.evento.id = :eventoId ORDER BY eph.durationMs ASC")
-    List<EventProcessingHistory> findByEventoIdOrderByDurationAsc(@Param("eventoId") Long eventoId);
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.event.id = :eventId ORDER BY eph.durationMs ASC")
+    List<EventProcessingHistory> findByEventIdOrderByDurationAsc(@Param("eventId") Long eventId);
     
-    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.evento.id = :eventoId ORDER BY eph.retryCount DESC")
-    List<EventProcessingHistory> findByEventoIdOrderByRetryCountDesc(@Param("eventoId") Long eventoId);
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.event.id = :eventId ORDER BY eph.retryCount DESC")
+    List<EventProcessingHistory> findByEventIdOrderByRetryCountDesc(@Param("eventId") Long eventId);
     
-    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.evento.id = :eventoId ORDER BY eph.retryCount ASC")
-    List<EventProcessingHistory> findByEventoIdOrderByRetryCountAsc(@Param("eventoId") Long eventoId);
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.event.id = :eventId ORDER BY eph.retryCount ASC")
+    List<EventProcessingHistory> findByEventIdOrderByRetryCountAsc(@Param("eventId") Long eventId);
     
-    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.evento.id = :eventoId ORDER BY eph.nextRetry ASC")
-    List<EventProcessingHistory> findByEventoIdOrderByNextRetryAsc(@Param("eventoId") Long eventoId);
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.event.id = :eventId ORDER BY eph.nextRetry ASC")
+    List<EventProcessingHistory> findByEventIdOrderByNextRetryAsc(@Param("eventId") Long eventId);
     
-    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.evento.id = :eventoId ORDER BY eph.memoryUsageMb DESC")
-    List<EventProcessingHistory> findByEventoIdOrderByMemoryUsageDesc(@Param("eventoId") Long eventoId);
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.event.id = :eventId ORDER BY eph.memoryUsageMb DESC")
+    List<EventProcessingHistory> findByEventIdOrderByMemoryUsageDesc(@Param("eventId") Long eventId);
     
-    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.evento.id = :eventoId ORDER BY eph.cpuUsagePercent DESC")
-    List<EventProcessingHistory> findByEventoIdOrderByCpuUsageDesc(@Param("eventoId") Long eventoId);
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.event.id = :eventId ORDER BY eph.cpuUsagePercent DESC")
+    List<EventProcessingHistory> findByEventIdOrderByCpuUsageDesc(@Param("eventId") Long eventId);
     
-    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.evento.id = :eventoId ORDER BY eph.inputSizeBytes DESC")
-    List<EventProcessingHistory> findByEventoIdOrderByInputSizeDesc(@Param("eventoId") Long eventoId);
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.event.id = :eventId ORDER BY eph.inputSizeBytes DESC")
+    List<EventProcessingHistory> findByEventIdOrderByInputSizeDesc(@Param("eventId") Long eventId);
     
-    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.evento.id = :eventoId ORDER BY eph.outputSizeBytes DESC")
-    List<EventProcessingHistory> findByEventoIdOrderByOutputSizeDesc(@Param("eventoId") Long eventoId);
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.event.id = :eventId ORDER BY eph.outputSizeBytes DESC")
+    List<EventProcessingHistory> findByEventIdOrderByOutputSizeDesc(@Param("eventId") Long eventId);
     
-    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.evento.id = :eventoId ORDER BY eph.dataCriacao DESC")
-    List<EventProcessingHistory> findByEventoIdOrderByCreationDateDesc(@Param("eventoId") Long eventoId);
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.event.id = :eventId ORDER BY eph.createdAt DESC")
+    List<EventProcessingHistory> findByEventIdOrderByCreationDateDesc(@Param("eventId") Long eventId);
     
-    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.evento.id = :eventoId ORDER BY eph.dataCriacao ASC")
-    List<EventProcessingHistory> findByEventoIdOrderByCreationDateAsc(@Param("eventoId") Long eventoId);
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.event.id = :eventId ORDER BY eph.createdAt ASC")
+    List<EventProcessingHistory> findByEventIdOrderByCreationDateAsc(@Param("eventId") Long eventId);
 }

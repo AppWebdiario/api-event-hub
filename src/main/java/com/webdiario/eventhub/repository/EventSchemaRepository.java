@@ -15,23 +15,23 @@ import java.util.Optional;
 @Repository
 public interface EventSchemaRepository extends JpaRepository<EventSchema, Long> {
 
-    Optional<EventSchema> findByTipoEventoAndVersao(String tipoEvento, String versao);
+    Optional<EventSchema> findByEventTypeAndVersion(String eventType, String version);
     
-    List<EventSchema> findByTipoEvento(String tipoEvento);
+    List<EventSchema> findByEventType(String eventType);
     
-    List<EventSchema> findByVersao(String versao);
+    List<EventSchema> findByVersion(String version);
     
-    List<EventSchema> findByAtivoTrue();
+    List<EventSchema> findByActiveTrue();
     
     List<EventSchema> findByDeprecatedTrue();
     
-    List<EventSchema> findByAtivoTrueAndDeprecatedFalse();
+    List<EventSchema> findByActiveTrueAndDeprecatedFalse();
     
-    @Query("SELECT es FROM EventSchema es WHERE es.tipoEvento = :tipoEvento AND es.active = true ORDER BY es.versao DESC")
-    List<EventSchema> findActiveSchemasByTipoEvento(@Param("tipoEvento") String tipoEvento);
+    @Query("SELECT es FROM EventSchema es WHERE es.eventType = :eventType AND es.active = true ORDER BY es.version DESC")
+    List<EventSchema> findActiveSchemasByEventType(@Param("eventType") String eventType);
     
-    @Query("SELECT es FROM EventSchema es WHERE es.tipoEvento = :tipoEvento ORDER BY es.versao DESC")
-    List<EventSchema> findAllSchemasByTipoEvento(@Param("tipoEvento") String tipoEvento);
+    @Query("SELECT es FROM EventSchema es WHERE es.eventType = :eventType ORDER BY es.version DESC")
+    List<EventSchema> findAllSchemasByEventType(@Param("eventType") String eventType);
     
     @Query("SELECT es FROM EventSchema es WHERE es.tags LIKE %:tag%")
     List<EventSchema> findByTag(@Param("tag") String tag);
@@ -42,11 +42,11 @@ public interface EventSchemaRepository extends JpaRepository<EventSchema, Long> 
     @Query("SELECT es FROM EventSchema es WHERE es.updatedBy = :updatedBy")
     List<EventSchema> findByUpdatedBy(@Param("updatedBy") String updatedBy);
     
-    @Query("SELECT es.tipoEvento, COUNT(es) FROM EventSchema es GROUP BY es.tipoEvento")
-    List<Object[]> countByTipoEvento();
+    @Query("SELECT es.eventType, COUNT(es) FROM EventSchema es GROUP BY es.eventType")
+    List<Object[]> countByEventType();
     
-    @Query("SELECT es.versao, COUNT(es) FROM EventSchema es GROUP BY es.versao")
-    List<Object[]> countByVersao();
+    @Query("SELECT es.version, COUNT(es) FROM EventSchema es GROUP BY es.version")
+    List<Object[]> countByVersion();
     
     @Query("SELECT es FROM EventSchema es WHERE es.usageCount > :minUsage")
     List<EventSchema> findFrequentlyUsedSchemas(@Param("minUsage") Long minUsage);
@@ -93,6 +93,6 @@ public interface EventSchemaRepository extends JpaRepository<EventSchema, Long> 
     @Query("SELECT es FROM EventSchema es WHERE es.metadata LIKE %:metadataKey%")
     List<EventSchema> findSchemasByMetadataKey(@Param("metadataKey") String metadataKey);
     
-    @Query("SELECT es FROM EventSchema es WHERE es.descricao LIKE %:description%")
+    @Query("SELECT es FROM EventSchema es WHERE es.description LIKE %:description%")
     List<EventSchema> findByDescriptionContaining(@Param("description") String description);
 }

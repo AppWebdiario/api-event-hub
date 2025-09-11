@@ -26,8 +26,8 @@ public class EventProcessingHistory {
 
     @NotNull(message = "Event is required")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "evento_id", nullable = false)
-    private Evento evento;
+    @JoinColumn(name = "event_id", nullable = false)
+    private Event event;
 
     @Column(name = "attempt_number", nullable = false)
     private Integer attemptNumber;
@@ -111,9 +111,9 @@ public class EventProcessingHistory {
     @Column(name = "tags", length = 500)
     private String tags;
 
-    @Column(name = "data_criacao", nullable = false)
+    @Column(name = "created_at", nullable = false)
     @Builder.Default
-    private LocalDateTime dataCriacao = LocalDateTime.now();
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @PrePersist
     protected void onCreate() {

@@ -1,6 +1,6 @@
 package com.webdiario.eventhub.dto;
 
-import com.webdiario.eventhub.entity.Evento;
+import com.webdiario.eventhub.entity.Event;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,24 +19,24 @@ public class EventResponse {
 
     private Long id;
     private String eventId;
-    private String tipoEvento;
-    private String origem;
-    private String versao;
-    private LocalDateTime timestampEvento;
-    private LocalDateTime timestampProcessamento;
+    private String eventType;
+    private String source;
+    private String version;
+    private LocalDateTime eventTimestamp;
+    private LocalDateTime processingTimestamp;
     private String correlationId;
     private String userId;
     private String tenantId;
     private String payload;
     private String schemaVersion;
-    private Evento.EventStatus status;
-    private Evento.EventPriority prioridade;
-    private Integer tentativasProcessamento;
-    private String erroProcessamento;
+    private Event.EventStatus status;
+    private Event.EventPriority priority;
+    private Integer processingAttempts;
+    private String processingError;
     private String metadata;
     private String tags;
-    private Long duracaoProcessamento;
-    private Long tamanhoPayload;
+    private Long processingDuration;
+    private Long payloadSize;
     private String hashPayload;
     private Boolean compressed;
     private Boolean encrypted;
@@ -45,45 +45,45 @@ public class EventResponse {
     private Long sequenceNumber;
     private LocalDateTime expiresAt;
     private Integer retentionDays;
-    private LocalDateTime dataCriacao;
-    private LocalDateTime dataAtualizacao;
-    private String usuarioCriacao;
-    private String usuarioAtualizacao;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private String createdBy;
+    private String updatedBy;
 
-    public static EventResponse fromEntity(Evento evento) {
+    public static EventResponse fromEntity(Event event) {
         return EventResponse.builder()
-                .id(evento.getId())
-                .eventId(evento.getEventId())
-                .tipoEvento(evento.getTipoEvento())
-                .origem(evento.getOrigem())
-                .versao(evento.getVersao())
-                .timestampEvento(evento.getTimestampEvento())
-                .timestampProcessamento(evento.getTimestampProcessamento())
-                .correlationId(evento.getCorrelationId())
-                .userId(evento.getUserId())
-                .tenantId(evento.getTenantId())
-                .payload(evento.getPayload())
-                .schemaVersion(evento.getSchemaVersion())
-                .status(evento.getStatus())
-                .prioridade(evento.getPrioridade())
-                .tentativasProcessamento(evento.getTentativasProcessamento())
-                .erroProcessamento(evento.getErroProcessamento())
-                .metadata(evento.getMetadata())
-                .tags(evento.getTags())
-                .duracaoProcessamento(evento.getDuracaoProcessamento())
-                .tamanhoPayload(evento.getTamanhoPayload())
-                .hashPayload(evento.getHashPayload())
-                .compressed(evento.getCompressed())
-                .encrypted(evento.getEncrypted())
-                .partitionKey(evento.getPartitionKey())
-                .shardId(evento.getShardId())
-                .sequenceNumber(evento.getSequenceNumber())
-                .expiresAt(evento.getExpiresAt())
-                .retentionDays(evento.getRetentionDays())
-                .dataCriacao(evento.getDataCriacao())
-                .dataAtualizacao(evento.getDataAtualizacao())
-                .usuarioCriacao(evento.getUsuarioCriacao())
-                .usuarioAtualizacao(evento.getUsuarioAtualizacao())
+                .id(event.getId())
+                .eventId(event.getEventId())
+                .eventType(event.getEventType())
+                .source(event.getSource())
+                .version(event.getVersion())
+                .eventTimestamp(event.getEventTimestamp())
+                .processingTimestamp(event.getProcessingTimestamp())
+                .correlationId(event.getCorrelationId())
+                .userId(event.getUserId())
+                .tenantId(event.getTenantId())
+                .payload(event.getPayload())
+                .schemaVersion(event.getSchemaVersion())
+                .status(event.getStatus())
+                .priority(event.getPriority())
+                .processingAttempts(event.getProcessingAttempts())
+                .processingError(event.getProcessingError())
+                .metadata(event.getMetadata())
+                .tags(event.getTags())
+                .processingDuration(event.getProcessingDuration())
+                .payloadSize(event.getPayloadSize())
+                .hashPayload(event.getHashPayload())
+                .compressed(event.getCompressed())
+                .encrypted(event.getEncrypted())
+                .partitionKey(event.getPartitionKey())
+                .shardId(event.getShardId())
+                .sequenceNumber(event.getSequenceNumber())
+                .expiresAt(event.getExpiresAt())
+                .retentionDays(event.getRetentionDays())
+                .createdAt(event.getCreatedAt())
+                .updatedAt(event.getUpdatedAt())
+                .createdBy(event.getCreatedBy())
+                .updatedBy(event.getUpdatedBy())
                 .build();
     }
 }
