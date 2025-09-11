@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
  * Entity for storing processed events
  */
 @Entity
-@Table(name = "events")
+@Table(name = "eventos")
 @Data
 @Builder
 @NoArgsConstructor
@@ -38,24 +38,24 @@ public class Event {
     private String eventId;
 
     @NotBlank(message = "Event type is required")
-    @Column(name = "event_type", nullable = false, length = 100)
-    private String eventType;
+    @Column(name = "tipo_evento", nullable = false, length = 100)
+    private String tipoEvento;
 
     @NotBlank(message = "Event source is required")
-    @Column(name = "source", nullable = false, length = 100)
-    private String source;
+    @Column(name = "origem", nullable = false, length = 100)
+    private String origem;
 
     @NotBlank(message = "Event version is required")
-    @Column(name = "version", nullable = false, length = 20)
-    private String version;
+    @Column(name = "versao", nullable = false, length = 20)
+    private String versao;
 
     @NotNull(message = "Event timestamp is required")
-    @Column(name = "event_timestamp", nullable = false)
-    private LocalDateTime eventTimestamp;
+    @Column(name = "timestamp_evento", nullable = false)
+    private LocalDateTime timestampEvento;
 
-    @Column(name = "processing_timestamp", nullable = false)
+    @Column(name = "timestamp_processamento", nullable = false)
     @Builder.Default
-    private LocalDateTime processingTimestamp = LocalDateTime.now();
+    private LocalDateTime timestampProcessamento = LocalDateTime.now();
 
     @Column(name = "correlation_id", length = 100)
     private String correlationId;
@@ -78,23 +78,23 @@ public class Event {
     private EventStatus status = EventStatus.PROCESSED;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "priority", length = 20)
+    @Column(name = "prioridade", length = 20)
     @Builder.Default
-    private EventPriority priority = EventPriority.NORMAL;
+    private EventPriority prioridade = EventPriority.NORMAL;
 
-    @Column(name = "processing_attempts")
+    @Column(name = "tentativas_processamento")
     @Builder.Default
-    private Integer processingAttempts = 0;
+    private Integer tentativasProcessamento = 0;
 
-    @Column(name = "max_attempts")
+    @Column(name = "max_tentativas")
     @Builder.Default
-    private Integer maxAttempts = 3;
+    private Integer maxTentativas = 3;
 
-    @Column(name = "next_retry")
-    private LocalDateTime nextRetry;
+    @Column(name = "proxima_tentativa")
+    private LocalDateTime proximaTentativa;
 
-    @Column(name = "processing_error", columnDefinition = "TEXT")
-    private String processingError;
+    @Column(name = "erro_processamento", columnDefinition = "TEXT")
+    private String erroProcessamento;
 
     @Column(name = "metadata", columnDefinition = "JSON")
     private String metadata;
@@ -102,11 +102,11 @@ public class Event {
     @Column(name = "tags", length = 500)
     private String tags;
 
-    @Column(name = "processing_duration")
-    private Long processingDuration; // milliseconds
+    @Column(name = "duracao_processamento")
+    private Long duracaoProcessamento; // milliseconds
 
-    @Column(name = "payload_size")
-    private Long payloadSize; // bytes
+    @Column(name = "tamanho_payload")
+    private Long tamanhoPayload; // bytes
 
     @Column(name = "hash_payload", length = 64)
     private String hashPayload;
@@ -136,22 +136,22 @@ public class Event {
     private Integer retentionDays = 90;
 
     // Audit fields
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "data_criacao", nullable = false)
     @Builder.Default
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime dataCriacao = LocalDateTime.now();
 
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    @Column(name = "data_atualizacao")
+    private LocalDateTime dataAtualizacao;
 
-    @Column(name = "created_by", length = 100)
-    private String createdBy;
+    @Column(name = "usuario_criacao", length = 100)
+    private String usuarioCriacao;
 
-    @Column(name = "updated_by", length = 100)
-    private String updatedBy;
+    @Column(name = "usuario_atualizacao", length = 100)
+    private String usuarioAtualizacao;
 
     @PreUpdate
     protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
+        this.dataAtualizacao = LocalDateTime.now();
     }
 
     // Helper methods
@@ -160,19 +160,19 @@ public class Event {
     }
 
     public boolean canRetry() {
-        return processingAttempts < maxAttempts;
+        return tentativasProcessamento < maxTentativas;
     }
 
     public boolean isRetryable() {
         return status == EventStatus.FAILED && canRetry();
     }
 
-    public void incrementAttempts() {
-        this.processingAttempts++;
+    public void incrementTentativas() {
+        this.tentativasProcessamento++;
     }
 
     public void setNextRetry(LocalDateTime nextRetry) {
-        this.nextRetry = nextRetry;
+        this.proximaTentativa = nextRetry;
     }
 
     public enum EventStatus {

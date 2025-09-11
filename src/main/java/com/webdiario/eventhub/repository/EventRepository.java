@@ -20,13 +20,13 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     Optional<Event> findByEventId(String eventId);
     
-    List<Event> findByEventType(String eventType);
+    List<Event> findByTipoEvento(String eventType);
     
-    List<Event> findBySource(String source);
+    List<Event> findByOrigem(String source);
     
     List<Event> findByStatus(Event.EventStatus status);
     
-    List<Event> findByPriority(Event.EventPriority priority);
+    List<Event> findByPrioridade(Event.EventPriority priority);
     
     List<Event> findByUserId(String userId);
     
@@ -34,20 +34,20 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     
     List<Event> findByCorrelationId(String correlationId);
     
-    List<Event> findByEventTimestampBetween(LocalDateTime start, LocalDateTime end);
+    List<Event> findByTimestampEventoBetween(LocalDateTime start, LocalDateTime end);
     
-    List<Event> findByProcessingTimestampBetween(LocalDateTime start, LocalDateTime end);
+    List<Event> findByTimestampProcessamentoBetween(LocalDateTime start, LocalDateTime end);
     
-    @Query("SELECT e FROM Event e WHERE e.eventTimestamp < :date AND e.status = 'PROCESSED'")
+    @Query("SELECT e FROM Event e WHERE e.timestampEvento < :date AND e.status = 'PROCESSED'")
     List<Event> findExpiredEvents(@Param("date") LocalDateTime date);
     
-    @Query("SELECT e FROM Event e WHERE e.processingAttempts >= e.maxAttempts AND e.status = 'FAILED'")
+    @Query("SELECT e FROM Event e WHERE e.tentativasProcessamento >= e.maxTentativas AND e.status = 'FAILED'")
     List<Event> findFailedEventsExceedingMaxRetries();
     
-    @Query("SELECT e FROM Event e WHERE e.nextRetry <= :now AND e.status = 'RETRY'")
+    @Query("SELECT e FROM Event e WHERE e.proximaTentativa <= :now AND e.status = 'RETRY'")
     List<Event> findRetryableEvents(@Param("now") LocalDateTime now);
     
-    @Query("SELECT e FROM Event e WHERE e.eventType = :eventType AND e.version = :version")
+    @Query("SELECT e FROM Event e WHERE e.tipoEvento = :eventType AND e.versao = :version")
     List<Event> findByEventTypeAndVersion(@Param("eventType") String eventType, @Param("version") String version);
     
     @Query("SELECT e FROM Event e WHERE e.payload LIKE %:searchTerm% OR e.metadata LIKE %:searchTerm%")
@@ -65,34 +65,34 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("SELECT e FROM Event e WHERE e.shardId = :shardId")
     List<Event> findByShardId(@Param("shardId") String shardId);
     
-    @Query("SELECT COUNT(e) FROM Event e WHERE e.eventType = :eventType AND e.status = :status")
+    @Query("SELECT COUNT(e) FROM Event e WHERE e.tipoEvento = :eventType AND e.status = :status")
     Long countByEventTypeAndStatus(@Param("eventType") String eventType, @Param("status") Event.EventStatus status);
     
-    @Query("SELECT e.eventType, COUNT(e) FROM Event e GROUP BY e.eventType")
+    @Query("SELECT e.tipoEvento, COUNT(e) FROM Event e GROUP BY e.tipoEvento")
     List<Object[]> countByEventType();
     
     @Query("SELECT e.status, COUNT(e) FROM Event e GROUP BY e.status")
     List<Object[]> countByStatus();
     
-    @Query("SELECT e.priority, COUNT(e) FROM Event e GROUP BY e.priority")
+    @Query("SELECT e.prioridade, COUNT(e) FROM Event e GROUP BY e.prioridade")
     List<Object[]> countByPriority();
     
-    @Query("SELECT e.source, COUNT(e) FROM Event e GROUP BY e.source")
+    @Query("SELECT e.origem, COUNT(e) FROM Event e GROUP BY e.origem")
     List<Object[]> countBySource();
     
-    @Query("SELECT AVG(e.processingDuration) FROM Event e WHERE e.processingDuration IS NOT NULL")
+    @Query("SELECT AVG(e.duracaoProcessamento) FROM Event e WHERE e.duracaoProcessamento IS NOT NULL")
     Double getAverageProcessingTime();
     
-    @Query("SELECT MAX(e.processingDuration) FROM Event e WHERE e.processingDuration IS NOT NULL")
+    @Query("SELECT MAX(e.duracaoProcessamento) FROM Event e WHERE e.duracaoProcessamento IS NOT NULL")
     Long getMaxProcessingTime();
     
-    @Query("SELECT MIN(e.processingDuration) FROM Event e WHERE e.processingDuration IS NOT NULL")
+    @Query("SELECT MIN(e.duracaoProcessamento) FROM Event e WHERE e.duracaoProcessamento IS NOT NULL")
     Long getMinProcessingTime();
     
-    @Query("SELECT e FROM Event e WHERE e.eventTimestamp >= :startDate ORDER BY e.eventTimestamp DESC")
+    @Query("SELECT e FROM Event e WHERE e.timestampEvento >= :startDate ORDER BY e.timestampEvento DESC")
     Page<Event> findRecentEvents(@Param("startDate") LocalDateTime startDate, Pageable pageable);
     
-    @Query("SELECT e FROM Event e WHERE e.eventTimestamp >= :startDate AND e.eventTimestamp <= :endDate")
+    @Query("SELECT e FROM Event e WHERE e.timestampEvento >= :startDate AND e.timestampEvento <= :endDate")
     List<Event> findEventsInTimeRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
     
     @Query("SELECT e FROM Event e WHERE e.compressed = true")
@@ -101,12 +101,12 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("SELECT e FROM Event e WHERE e.encrypted = true")
     List<Event> findEncryptedEvents();
     
-    @Query("SELECT e FROM Event e WHERE e.payloadSize > :minSize")
+    @Query("SELECT e FROM Event e WHERE e.tamanhoPayload > :minSize")
     List<Event> findLargeEvents(@Param("minSize") Long minSize);
     
-    @Query("SELECT e FROM Event e WHERE e.processingError IS NOT NULL AND e.processingError != ''")
+    @Query("SELECT e FROM Event e WHERE e.erroProcessamento IS NOT NULL AND e.erroProcessamento != ''")
     List<Event> findEventsWithErrors();
     
-    @Query("SELECT e FROM Event e WHERE e.processingError LIKE %:errorPattern%")
+    @Query("SELECT e FROM Event e WHERE e.erroProcessamento LIKE %:errorPattern%")
     List<Event> findEventsByErrorPattern(@Param("errorPattern") String errorPattern);
 }
