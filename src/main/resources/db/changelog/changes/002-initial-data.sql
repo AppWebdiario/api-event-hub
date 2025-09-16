@@ -1,5 +1,7 @@
--- Insert initial event schemas
--- This script creates default JSON schemas for common event types
+--liquibase formatted sql
+
+--changeset webdiario-event-hub:002-initial-data
+--comment: Insert initial event schemas
 
 -- User Created Event Schema
 INSERT INTO event_schemas (event_type, version, schema_json, description, active, tags, required_fields, optional_fields, created_by) VALUES

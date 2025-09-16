@@ -1,5 +1,7 @@
--- Create event hub database schema
--- This script creates all necessary tables for the event hub system
+--liquibase formatted sql
+
+--changeset webdiario-event-hub:001-create-schema
+--comment: Create event hub database schema
 
 -- Events table
 CREATE TABLE IF NOT EXISTS events (
