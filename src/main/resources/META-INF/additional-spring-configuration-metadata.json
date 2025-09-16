@@ -1,0 +1,119 @@
+{
+  "properties": [
+    {
+      "name": "spring.rabbitmq.host",
+      "type": "java.lang.String",
+      "description": "Host do servidor RabbitMQ"
+    },
+    {
+      "name": "spring.rabbitmq.port",
+      "type": "java.lang.Integer",
+      "description": "Porta do servidor RabbitMQ"
+    },
+    {
+      "name": "spring.rabbitmq.username",
+      "type": "java.lang.String",
+      "description": "Nome de usuário para autenticação no RabbitMQ"
+    },
+    {
+      "name": "spring.rabbitmq.password",
+      "type": "java.lang.String",
+      "description": "Senha para autenticação no RabbitMQ"
+    },
+    {
+      "name": "spring.rabbitmq.virtual-host",
+      "type": "java.lang.String",
+      "description": "Virtual host do RabbitMQ"
+    },
+    {
+      "name": "event-hub.rabbitmq.exchanges.user-events",
+      "type": "java.lang.String",
+      "description": "Exchange RabbitMQ para eventos de usuário"
+    },
+    {
+      "name": "event-hub.rabbitmq.exchanges.system-events",
+      "type": "java.lang.String",
+      "description": "Exchange RabbitMQ para eventos do sistema"
+    },
+    {
+      "name": "event-hub.rabbitmq.exchanges.notification-events",
+      "type": "java.lang.String",
+      "description": "Exchange RabbitMQ para eventos de notificação"
+    },
+    {
+      "name": "event-hub.rabbitmq.queues.user-events",
+      "type": "java.lang.String",
+      "description": "Fila RabbitMQ para eventos de usuário"
+    },
+    {
+      "name": "event-hub.rabbitmq.queues.system-events",
+      "type": "java.lang.String",
+      "description": "Fila RabbitMQ para eventos do sistema"
+    },
+    {
+      "name": "event-hub.rabbitmq.queues.notification-events",
+      "type": "java.lang.String",
+      "description": "Fila RabbitMQ para eventos de notificação"
+    },
+    {
+      "name": "event-hub.rabbitmq.queues.dead-letter",
+      "type": "java.lang.String",
+      "description": "Fila RabbitMQ para mensagens mortas (Dead Letter Queue)"
+    },
+    {
+      "name": "event-hub.rabbitmq.routing-keys.user-created",
+      "type": "java.lang.String",
+      "description": "Routing key para eventos de criação de usuário"
+    },
+    {
+      "name": "event-hub.rabbitmq.routing-keys.user-updated",
+      "type": "java.lang.String",
+      "description": "Routing key para eventos de atualização de usuário"
+    },
+    {
+      "name": "event-hub.rabbitmq.routing-keys.user-deleted",
+      "type": "java.lang.String",
+      "description": "Routing key para eventos de exclusão de usuário"
+    },
+    {
+      "name": "event-hub.rabbitmq.routing-keys.system-alert",
+      "type": "java.lang.String",
+      "description": "Routing key para alertas do sistema"
+    },
+    {
+      "name": "event-hub.rabbitmq.routing-keys.notification-sent",
+      "type": "java.lang.String",
+      "description": "Routing key para notificações enviadas"
+    },
+    {
+      "name": "event-hub.batch-size",
+      "type": "java.lang.Integer",
+      "description": "Tamanho do lote para processamento de eventos"
+    },
+    {
+      "name": "event-hub.retry-attempts",
+      "type": "java.lang.Integer",
+      "description": "Número de tentativas de reprocessamento em caso de falha"
+    },
+    {
+      "name": "event-hub.retry-delay",
+      "type": "java.lang.Long",
+      "description": "Delay em milissegundos entre tentativas de reprocessamento"
+    },
+    {
+      "name": "event-hub.dead-letter-queue",
+      "type": "java.lang.String",
+      "description": "Nome da fila de mensagens mortas para eventos que falharam"
+    },
+    {
+      "name": "event-hub.event-retention-days",
+      "type": "java.lang.Integer",
+      "description": "Número de dias para retenção de eventos no sistema"
+    },
+    {
+      "name": "event-hub.max-event-size",
+      "type": "java.lang.Long",
+      "description": "Tamanho máximo em bytes para um evento individual"
+    }
+  ]
+}

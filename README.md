@@ -1,6 +1,6 @@
 # WebDiario Event Hub
 
-Sistema centralizado para tratamento, validação, armazenamento e distribuição de eventos usando AWS SQS, SNS e armazenamento estruturado para consulta posterior.
+Sistema centralizado para tratamento, validação, armazenamento e distribuição de eventos usando RabbitMQ e armazenamento estruturado para consulta posterior.
 
 ## 🚀 Funcionalidades
 
@@ -8,7 +8,7 @@ Sistema centralizado para tratamento, validação, armazenamento e distribuiçã
 - **Processamento de Eventos**: Recebe, valida e processa eventos de diferentes origens
 - **Validação JSON Schema**: Validação automática de eventos usando schemas JSON configuráveis
 - **Armazenamento Estruturado**: Persistência de eventos em banco MySQL com histórico completo
-- **Distribuição AWS**: Integração com SQS para filas e SNS para tópicos
+- **Distribuição RabbitMQ**: Integração com RabbitMQ para filas e exchanges
 - **Monitoramento**: Rastreamento completo do processamento com métricas de performance
 
 ### Event Management
@@ -35,7 +35,7 @@ Sistema centralizado para tratamento, validação, armazenamento e distribuiçã
                                 │                        │
                                 ▼                        ▼
                        ┌──────────────────┐    ┌─────────────────┐
-                       │ Schema Registry  │    │   AWS SQS/SNS   │
+                       │ Schema Registry  │    │   RabbitMQ      │
                        └──────────────────┘    └─────────────────┘
                                 │                        │
                                 ▼                        ▼
@@ -49,9 +49,9 @@ Sistema centralizado para tratamento, validação, armazenamento e distribuiçã
 - **Spring Data JPA**: Persistência de dados
 - **MySQL 8.0**: Banco de dados principal
 - **Liquibase**: Migrações de banco de dados
-- **AWS SDK**: Integração com serviços AWS (SQS, SNS)
+- **RabbitMQ**: Sistema de mensageria open source
 - **JSON Schema Validator**: Validação de eventos
-- **Spring Cloud AWS**: Integração com AWS Messaging
+- **Spring AMQP**: Integração com RabbitMQ
 
 ## 📊 Estrutura do Banco de Dados
 
@@ -84,10 +84,11 @@ spring.datasource.url=jdbc:mysql://localhost:3306/webdiario_event_hub
 spring.datasource.username=root
 spring.datasource.password=root
 
-# AWS Configuration
-aws.region=us-east-1
-aws.sqs.endpoint=http://localhost:4566  # LocalStack for development
-aws.sns.endpoint=http://localhost:4566
+# RabbitMQ Configuration
+spring.rabbitmq.host=localhost
+spring.rabbitmq.port=5672
+spring.rabbitmq.username=guest
+spring.rabbitmq.password=guest
 
 # Event Hub Configuration
 event-hub.batch-size=100
@@ -96,20 +97,21 @@ event-hub.retry-delay=1000
 event-hub.event-retention-days=90
 ```
 
-### Configuração de Filas SQS
+### Configuração de Exchanges RabbitMQ
 ```yaml
-aws.sqs.queues:
-  user-events: webdiario-user-events
-  system-events: webdiario-system-events
-  notification-events: webdiario-notification-events
+event-hub.rabbitmq.exchanges:
+  user-events: webdiario.user.events
+  system-events: webdiario.system.events
+  notification-events: webdiario.notification.events
 ```
 
-### Configuração de Tópicos SNS
+### Configuração de Filas RabbitMQ
 ```yaml
-aws.sns.topics:
-  user-notifications: webdiario-user-notifications
-  system-alerts: webdiario-system-alerts
-  audit-logs: webdiario-audit-logs
+event-hub.rabbitmq.queues:
+  user-events: webdiario.user.events.queue
+  system-events: webdiario.system.events.queue
+  notification-events: webdiario.notification.events.queue
+  dead-letter: webdiario.dlq
 ```
 
 ## 📝 Schemas de Eventos
@@ -200,7 +202,7 @@ aws.sns.topics:
 - Java 21+
 - Maven 3.8+
 - MySQL 8.0+
-- Docker (para LocalStack)
+- RabbitMQ 3.8+
 
 ### Execução Local
 ```bash
@@ -217,8 +219,8 @@ mvn spring-boot:run
 
 ### Execução com Docker
 ```bash
-# Inicie o LocalStack para desenvolvimento
-docker-compose up -d
+# Inicie o RabbitMQ para desenvolvimento
+docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
 
 # Execute a aplicação
 mvn spring-boot:run
@@ -248,7 +250,7 @@ mvn spring-boot:run
 ### Monitoramento
 - `GET /api/event-hub/health` - Status da aplicação
 - `GET /api/event-hub/metrics` - Métricas de performance
-- `GET /api/event-hub/queues/status` - Status das filas SQS
+- `GET /api/event-hub/queues/status` - Status das filas RabbitMQ
 
 ## 🔍 Consultas e Filtros
 
@@ -342,7 +344,7 @@ event-hub:
 
 ### Health Checks
 - **Database**: Conexão com MySQL
-- **AWS Services**: Status de SQS e SNS
+- **RabbitMQ**: Status de conexão e filas
 - **Event Processing**: Status dos processadores
 - **Schema Validation**: Status do validador JSON
 
@@ -350,13 +352,14 @@ event-hub:
 
 ### Configuração de Produção
 ```yaml
-# AWS Production
-aws:
-  region: us-east-1
-  sqs:
-    endpoint: https://sqs.us-east-1.amazonaws.com
-  sns:
-    endpoint: https://sns.us-east-1.amazonaws.com
+# RabbitMQ Production
+spring:
+  rabbitmq:
+    host: rabbitmq.production.com
+    port: 5672
+    username: webdiario
+    password: secure_password
+    virtual-host: /webdiario
 
 # Performance
 event-hub:
@@ -373,7 +376,7 @@ event-hub:
 - **Caching**: Cache Redis para schemas e metadados
 
 ### Monitoramento em Produção
-- **CloudWatch**: Métricas AWS e logs
+- **RabbitMQ Management**: Interface web para monitoramento
 - **Prometheus + Grafana**: Métricas customizadas
 - **ELK Stack**: Logs centralizados
 - **Sentry**: Rastreamento de erros
@@ -400,7 +403,7 @@ mvn test -Dtest=*ContainerTest
 - [API Documentation](http://localhost:8082/api/event-hub/swagger-ui.html)
 - [Database Schema](docs/database-schema.md)
 - [Event Schemas](docs/event-schemas.md)
-- [AWS Integration](docs/aws-integration.md)
+- [RabbitMQ Integration](docs/rabbitmq-integration.md)
 - [Performance Tuning](docs/performance-tuning.md)
 
 ## 🤝 Contribuição

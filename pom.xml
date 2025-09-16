@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.0</version>
+        <version>3.5.5</version>
         <relativePath/>
     </parent>
 
@@ -17,11 +17,10 @@
     <version>1.0.0</version>
     <packaging>jar</packaging>
     <name>WebDiario Event Hub</name>
-    <description>Event Hub for WebDiario system with AWS SQS, SNS and event storage</description>
+    <description>Event Hub for WebDiario system with RabbitMQ and event storage</description>
 
     <properties>
         <java.version>21</java.version>
-        <spring-cloud-aws.version>3.0.1</spring-cloud-aws.version>
     </properties>
 
     <dependencies>
@@ -46,23 +45,10 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
-        <!-- Spring Cloud AWS -->
+        <!-- Spring AMQP for RabbitMQ -->
         <dependency>
-            <groupId>io.awspring.cloud</groupId>
-            <artifactId>spring-cloud-aws-starter</artifactId>
-            <version>${spring-cloud-aws.version}</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>io.awspring.cloud</groupId>
-            <artifactId>spring-cloud-aws-starter-sqs</artifactId>
-            <version>${spring-cloud-aws.version}</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>io.awspring.cloud</groupId>
-            <artifactId>spring-cloud-aws-starter-sns</artifactId>
-            <version>${spring-cloud-aws.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
         </dependency>
 
         <!-- Database -->

@@ -163,4 +163,80 @@ public interface EventProcessingHistoryRepository extends JpaRepository<EventPro
     
     @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.event.id = :eventId ORDER BY eph.createdAt ASC")
     List<EventProcessingHistory> findByEventIdOrderByCreationDateAsc(@Param("eventId") Long eventId);
+    
+    // Optimized queries based on composite indexes from Liquibase
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.event.id = :eventId AND eph.attemptNumber = :attemptNumber AND eph.status = :status")
+    List<EventProcessingHistory> findByEventIdAndAttemptNumberAndStatus(@Param("eventId") Long eventId, @Param("attemptNumber") Integer attemptNumber, @Param("status") EventProcessingHistory.ProcessingStatus status);
+    
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.processorId = :processorId AND eph.status = :status AND eph.processingStart >= :startDate ORDER BY eph.processingStart DESC")
+    List<EventProcessingHistory> findByProcessorIdAndStatusAndProcessingStart(@Param("processorId") String processorId, @Param("status") EventProcessingHistory.ProcessingStatus status, @Param("startDate") LocalDateTime startDate);
+    
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.status = :status AND eph.processingStart >= :startDate AND eph.processingEnd <= :endDate ORDER BY eph.processingStart DESC")
+    List<EventProcessingHistory> findByStatusAndProcessingTimeRange(@Param("status") EventProcessingHistory.ProcessingStatus status, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+    
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.errorCode = :errorCode AND eph.status = :status AND eph.processingStart >= :startDate ORDER BY eph.processingStart DESC")
+    List<EventProcessingHistory> findByErrorCodeAndStatusAndProcessingStart(@Param("errorCode") String errorCode, @Param("status") EventProcessingHistory.ProcessingStatus status, @Param("startDate") LocalDateTime startDate);
+    
+    // Performance monitoring queries
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.durationMs > :maxDuration ORDER BY eph.durationMs DESC")
+    List<EventProcessingHistory> findSlowProcessingHistories(@Param("maxDuration") Long maxDuration);
+    
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.memoryUsageMb > :maxMemory ORDER BY eph.memoryUsageMb DESC")
+    List<EventProcessingHistory> findHighMemoryUsageHistories(@Param("maxMemory") Long maxMemory);
+    
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.cpuUsagePercent > :maxCpu ORDER BY eph.cpuUsagePercent DESC")
+    List<EventProcessingHistory> findHighCpuUsageHistories(@Param("maxCpu") Double maxCpu);
+    
+    // Error analysis queries
+    @Query("SELECT eph.errorCode, COUNT(eph) FROM EventProcessingHistory eph WHERE eph.status = 'FAILED' AND eph.processingStart >= :startDate GROUP BY eph.errorCode ORDER BY COUNT(eph) DESC")
+    List<Object[]> getErrorCodeCounts(@Param("startDate") LocalDateTime startDate);
+    
+    @Query("SELECT eph.processorId, COUNT(eph) FROM EventProcessingHistory eph WHERE eph.status = 'FAILED' AND eph.processingStart >= :startDate GROUP BY eph.processorId ORDER BY COUNT(eph) DESC")
+    List<Object[]> getProcessorFailureCounts(@Param("startDate") LocalDateTime startDate);
+    
+    @Query("SELECT eph.processorType, COUNT(eph) FROM EventProcessingHistory eph WHERE eph.status = 'FAILED' AND eph.processingStart >= :startDate GROUP BY eph.processorType ORDER BY COUNT(eph) DESC")
+    List<Object[]> getProcessorTypeFailureCounts(@Param("startDate") LocalDateTime startDate);
+    
+    // Performance analytics queries
+    @Query("SELECT AVG(eph.durationMs) FROM EventProcessingHistory eph WHERE eph.status = 'SUCCESS' AND eph.durationMs IS NOT NULL AND eph.processingStart >= :startDate")
+    Double getAverageProcessingTime(@Param("startDate") LocalDateTime startDate);
+    
+    @Query("SELECT MAX(eph.durationMs) FROM EventProcessingHistory eph WHERE eph.status = 'SUCCESS' AND eph.durationMs IS NOT NULL AND eph.processingStart >= :startDate")
+    Long getMaxProcessingTime(@Param("startDate") LocalDateTime startDate);
+    
+    @Query("SELECT MIN(eph.durationMs) FROM EventProcessingHistory eph WHERE eph.status = 'SUCCESS' AND eph.durationMs IS NOT NULL AND eph.processingStart >= :startDate")
+    Long getMinProcessingTime(@Param("startDate") LocalDateTime startDate);
+    
+    @Query("SELECT AVG(eph.memoryUsageMb) FROM EventProcessingHistory eph WHERE eph.memoryUsageMb IS NOT NULL AND eph.processingStart >= :startDate")
+    Double getAverageMemoryUsage(@Param("startDate") LocalDateTime startDate);
+    
+    @Query("SELECT AVG(eph.cpuUsagePercent) FROM EventProcessingHistory eph WHERE eph.cpuUsagePercent IS NOT NULL AND eph.processingStart >= :startDate")
+    Double getAverageCpuUsage(@Param("startDate") LocalDateTime startDate);
+    
+    // Health check queries
+    @Query("SELECT COUNT(eph) FROM EventProcessingHistory eph WHERE eph.status = 'STARTED' AND eph.processingStart < :threshold")
+    Long countStuckStartedProcessings(@Param("threshold") LocalDateTime threshold);
+    
+    @Query("SELECT COUNT(eph) FROM EventProcessingHistory eph WHERE eph.status = 'PROCESSING' AND eph.processingStart < :threshold")
+    Long countStuckProcessingHistories(@Param("threshold") LocalDateTime threshold);
+    
+    @Query("SELECT COUNT(eph) FROM EventProcessingHistory eph WHERE eph.status = 'FAILED' AND eph.retryCount >= 3")
+    Long countPermanentlyFailedProcessings();
+    
+    // Cleanup queries
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.processingStart < :cutoffDate AND eph.status IN ('SUCCESS', 'FAILED', 'CANCELLED')")
+    List<EventProcessingHistory> findOldCompletedProcessings(@Param("cutoffDate") LocalDateTime cutoffDate);
+    
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.processingStart < :cutoffDate AND eph.status = 'TIMEOUT'")
+    List<EventProcessingHistory> findOldTimeoutProcessings(@Param("cutoffDate") LocalDateTime cutoffDate);
+    
+    // Trace and correlation queries
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.traceId = :traceId ORDER BY eph.processingStart ASC")
+    List<EventProcessingHistory> findByTraceIdOrderByProcessingStart(@Param("traceId") String traceId);
+    
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.correlationId = :correlationId ORDER BY eph.processingStart ASC")
+    List<EventProcessingHistory> findByCorrelationIdOrderByProcessingStart(@Param("correlationId") String correlationId);
+    
+    @Query("SELECT eph FROM EventProcessingHistory eph WHERE eph.spanId = :spanId ORDER BY eph.processingStart ASC")
+    List<EventProcessingHistory> findBySpanIdOrderByProcessingStart(@Param("spanId") String spanId);
 }

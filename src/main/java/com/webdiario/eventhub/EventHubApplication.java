@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * Main application class for WebDiario Event Hub
- * Provides event processing, storage and distribution using AWS SQS and SNS
+ * Provides event processing, storage and distribution using RabbitMQ
  */
 @SpringBootApplication
 @EntityScan("com.webdiario.eventhub.entity")

@@ -51,9 +51,6 @@ public interface EventSchemaRepository extends JpaRepository<EventSchema, Long> 
     @Query("SELECT es FROM EventSchema es WHERE es.usageCount > :minUsage")
     List<EventSchema> findFrequentlyUsedSchemas(@Param("minUsage") Long minUsage);
     
-    @Query("SELECT es FROM EventSchema es WHERE es.lastUsed IS NOT NULL ORDER BY es.lastUsed DESC")
-    List<EventSchema> findRecentlyUsedSchemas();
-    
     @Query("SELECT es FROM EventSchema es WHERE es.deprecationDate IS NOT NULL AND es.deprecationDate <= CURRENT_TIMESTAMP")
     List<EventSchema> findDeprecatedSchemas();
     
@@ -95,4 +92,60 @@ public interface EventSchemaRepository extends JpaRepository<EventSchema, Long> 
     
     @Query("SELECT es FROM EventSchema es WHERE es.description LIKE %:description%")
     List<EventSchema> findByDescriptionContaining(@Param("description") String description);
+    
+    // Optimized queries based on composite indexes from Liquibase
+    @Query("SELECT es FROM EventSchema es WHERE es.eventType = :eventType AND es.active = true AND es.deprecated = false ORDER BY es.version DESC")
+    List<EventSchema> findActiveNonDeprecatedSchemasByEventType(@Param("eventType") String eventType);
+    
+    @Query("SELECT es FROM EventSchema es WHERE es.eventType = :eventType AND es.version = :version AND es.active = true")
+    Optional<EventSchema> findActiveSchemaByEventTypeAndVersion(@Param("eventType") String eventType, @Param("version") String version);
+    
+    // Schema management queries
+    @Query("SELECT es FROM EventSchema es WHERE es.deprecated = true AND es.deprecationDate IS NOT NULL AND es.deprecationDate <= :now")
+    List<EventSchema> findSchemasToBeDeprecated(@Param("now") java.time.LocalDateTime now);
+    
+    @Query("SELECT es FROM EventSchema es WHERE es.active = true AND es.usageCount = 0 AND es.createdAt < :cutoffDate")
+    List<EventSchema> findUnusedActiveSchemas(@Param("cutoffDate") java.time.LocalDateTime cutoffDate);
+    
+    @Query("SELECT es FROM EventSchema es WHERE es.active = true ORDER BY es.usageCount DESC")
+    List<EventSchema> findMostUsedActiveSchemas();
+    
+    @Query("SELECT es FROM EventSchema es WHERE es.lastUsed IS NOT NULL ORDER BY es.lastUsed DESC")
+    List<EventSchema> findRecentlyUsedSchemas();
+    
+    // Schema validation and compatibility queries
+    @Query("SELECT es FROM EventSchema es WHERE es.validationRules IS NOT NULL AND es.validationRules != '' AND es.active = true")
+    List<EventSchema> findActiveSchemasWithValidationRules();
+    
+    @Query("SELECT es FROM EventSchema es WHERE es.compatibilityMatrix IS NOT NULL AND es.compatibilityMatrix != ''")
+    List<EventSchema> findSchemasWithCompatibilityMatrix();
+    
+    @Query("SELECT es FROM EventSchema es WHERE es.migrationGuide IS NOT NULL AND es.migrationGuide != '' AND es.deprecated = true")
+    List<EventSchema> findDeprecatedSchemasWithMigrationGuide();
+    
+    // Analytics queries
+    @Query("SELECT es.eventType, COUNT(es) FROM EventSchema es WHERE es.active = true GROUP BY es.eventType")
+    List<Object[]> countActiveSchemasByEventType();
+    
+    @Query("SELECT es.version, COUNT(es) FROM EventSchema es WHERE es.active = true GROUP BY es.version ORDER BY es.version DESC")
+    List<Object[]> countActiveSchemasByVersion();
+    
+    @Query("SELECT es.createdBy, COUNT(es) FROM EventSchema es GROUP BY es.createdBy ORDER BY COUNT(es) DESC")
+    List<Object[]> countSchemasByCreator();
+    
+    @Query("SELECT AVG(es.usageCount) FROM EventSchema es WHERE es.active = true")
+    Double getAverageUsageCount();
+    
+    @Query("SELECT MAX(es.usageCount) FROM EventSchema es WHERE es.active = true")
+    Long getMaxUsageCount();
+    
+    // Health check queries
+    @Query("SELECT COUNT(es) FROM EventSchema es WHERE es.active = true AND es.deprecated = false")
+    Long countActiveNonDeprecatedSchemas();
+    
+    @Query("SELECT COUNT(es) FROM EventSchema es WHERE es.deprecated = true AND es.deprecationDate IS NULL")
+    Long countDeprecatedSchemasWithoutDeprecationDate();
+    
+    @Query("SELECT COUNT(es) FROM EventSchema es WHERE es.active = false AND es.deprecated = false")
+    Long countInactiveNonDeprecatedSchemas();
 }
