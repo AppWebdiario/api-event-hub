@@ -1,0 +1,49 @@
+name: api-event-hub
+namespace: api-event-hub
+containerPort: 8080
+replicaCount: 1
+
+
+# Configurações de health check
+healthCheckPath: /api/actuator/health
+initialDelaySeconds: 60
+periodSeconds: 10
+timeoutSeconds: 5
+failureThreshold: 3
+
+
+# Variáveis de ambiente da aplicação
+env:
+  - SPRING_PROFILES_ACTIVE: "production"
+  - DB_HOST: "host.minikube.internal"
+  - DB_PORT: "3306"
+  - DB_NAME: "eventhub"
+  - DB_USERNAME: "eventhub"
+  - DB_PASSWORD: "eventhub123"
+  - SERVER_PORT: "8080"
+  - OAUTH2_SERVER_URL: "https://keycloak.appwebdiario.com.br/"
+  - OAUTH2_CONTEXT_PATH: "/"
+  - RABBITMQ_HOST: "host.minikube.internal"
+  - RABBITMQ_PORT: "5672"
+  - RABBITMQ_USERNAME: "webdiario"
+  - RABBITMQ_PASSWORD: "webdiario123"
+  - RABBITMQ_USER_EVENTS_EXCHANGE: "webdiario.user.events"
+  - RABBITMQ_SYSTEM_EVENTS_EXCHANGE: "webdiario.system.events"
+  - RABBITMQ_NOTIFICATION_EVENTS_EXCHANGE: "webdiario.notification.events"
+
+
+# Configurações de infraestrutura
+infra:
+  - type: ingress
+    host:
+      - host: api-event-hub.appwebdiario.com.br
+      - host: api-event-hub.appwebdiario.local
+
+# Configurações de recursos
+resources:
+  cpu:
+    request: 500m
+    limit: 2
+  memory:
+    request: 1Gi
+    limit: 4Gi

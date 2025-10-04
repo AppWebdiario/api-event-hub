@@ -1,0 +1,158 @@
+kind: pipeline
+type: docker
+name: Build
+
+trigger:
+  event:
+    - push
+  branch:
+    exclude:
+      - master
+steps:
+- name: restore-cache
+  image: meltwater/drone-cache:latest
+  volumes:
+    - name: cache
+      path: /tmp/cache
+  settings:
+    backend: filesystem
+    root: /tmp/cache
+    restore: true
+    cache_key: "api-event-hub"
+    archive_format: "gzip"
+    ttl: 1
+    mount:
+      - .m2/repository
+
+# Step 2: Build do Maven
+- name: build-maven
+  image: registry.appwebdiario.com.br/appwebdiario/maven:latest
+  pull_policy: never
+  commands:
+    - echo "Iniciando build do Maven..."
+    - mvn clean compile -DskipTests
+    - echo "Build do Maven concluído com sucesso!"
+
+# Step 2: Build do Maven
+- name: test
+  image: registry.appwebdiario.com.br/appwebdiario/maven:latest
+  pull_policy: never
+  commands:
+    - echo "Iniciando build do Maven..."
+    - mvn test
+    - echo "Build do Maven concluído com sucesso!"
+
+- name: save-cache
+  image: meltwater/drone-cache:latest
+  volumes:
+    - name: cache
+      path: /tmp/cache
+  settings:
+    backend: filesystem
+    root: /tmp/cache
+    rebuild: true
+    cache_key: "api-event-hub"
+    archive_format: "gzip"
+    ttl: 1
+    mount:
+      - .m2/repository
+
+volumes:
+- name: cache
+  host:
+    path: /var/cache/drone
+
+---
+kind: pipeline
+type: docker
+name: Deploy
+
+trigger:
+  event:
+    - push
+  branch:
+    include:
+      - master
+
+steps:
+- name: restore-cache
+  image: meltwater/drone-cache:latest
+  volumes:
+    - name: cache
+      path: /tmp/cache
+  settings:
+    backend: filesystem
+    root: /tmp/cache
+    restore: true
+    cache_key: "api-event-hub"
+    archive_format: "gzip"
+    ttl: 1
+    mount:
+      - .m2/repository
+
+# Step 2: Build do Maven
+- name: build-maven
+  image: registry.appwebdiario.com.br/appwebdiario/maven:latest
+  pull_policy: never
+  commands:
+    - echo "Iniciando build do Maven..."
+    - mvn clean package -DskipTests
+    - echo "Build do Maven concluído com sucesso!"z
+
+- name: save-cache
+  image: meltwater/drone-cache:latest
+  volumes:
+    - name: cache
+      path: /tmp/cache
+  settings:
+    backend: filesystem
+    root: /tmp/cache
+    rebuild: true
+    cache_key: "api-event-hub"
+    archive_format: "gzip"
+    ttl: 1
+    mount:
+      - .m2/repository
+
+######################################################   build-push
+- name: build-push
+  image: docker:dind
+  pull: always
+  volumes:
+  - name: dockersock
+    path: /var/run
+  privileged: true
+  environment:
+    USERNAME:
+      from_secret: docker_username
+    PASSWORD:
+      from_secret: docker_password
+  commands:
+  - sleep 5 ## give docker enough time to start
+  - echo $PASSWORD | docker login -u $USERNAME registry.appwebdiario.com.br --password-stdin
+  - docker build -t registry.appwebdiario.com.br/appwebdiario/api-event-hub:${DRONE_COMMIT_SHA:0:7} .
+  - docker push registry.appwebdiario.com.br/appwebdiario/api-event-hub:${DRONE_COMMIT_SHA:0:7}
+
+######################################################   Delivery
+- name: delivery
+  image: registry.appwebdiario.com.br/appwebdiario/pipeline-base-module:latest
+  pull: always
+  environment:
+    GITOPS_IMAGE_TAG: ${DRONE_COMMIT_SHA:0:7}
+    GITOPS_YAML_FILE: application.yml
+
+########################################################   Services
+services:
+- name: docker
+  image: docker:dind
+  privileged: true
+  volumes:
+  - name: dockersock
+    path: /var/run
+
+volumes:
+- name: cache
+  host:
+    path: /var/cache/drone
+- name: dockersock
+  temp: {}

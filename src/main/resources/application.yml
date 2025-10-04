@@ -1,41 +1,31 @@
 server:
   port: 8082
   servlet:
-    context-path: /api/event-hub
+    context-path: /api
 
 spring:
   application:
     name: webdiario-event-hub
-  
-  profiles:
-    active: local
-  
+
   datasource:
-    url: ${DATABASE_URL:jdbc:mysql://localhost:3306/webdiario_event_hub?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
-    username: ${DATABASE_USERNAME:webdiario}
-    password: ${DATABASE_PASSWORD:password}
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:eventhub}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: ${DB_USERNAME:eventhub}
+    password: ${DB_PASSWORD:eventhub123}
     driver-class-name: com.mysql.cj.jdbc.Driver
-    
+
   jpa:
-    hibernate:
-      ddl-auto: none
     show-sql: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
-        "[format_sql]": true
-        
   liquibase:
     enabled: false
-    change-log: classpath:db/changelog/db.changelog-master.xml
-    contexts: dev
-    default-schema: webdiario_event_hub
 
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
     port: ${RABBITMQ_PORT:5672}
-    username: ${RABBITMQ_USERNAME:guest}
-    password: ${RABBITMQ_PASSWORD:guest}
+    username: ${RABBITMQ_USERNAME:webdiario}
+    password: ${RABBITMQ_PASSWORD:webdiario123}
     virtual-host: ${RABBITMQ_VIRTUAL_HOST:/}
     connection-timeout: ${RABBITMQ_CONNECTION_TIMEOUT:15000}
     listener:
