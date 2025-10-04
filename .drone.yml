@@ -67,6 +67,7 @@ kind: pipeline
 type: docker
 name: Deploy
 
+
 trigger:
   event:
     - push
