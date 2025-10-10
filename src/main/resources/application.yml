@@ -1,5 +1,5 @@
 server:
-  port: 8082
+  port: ${SERVER_PORT:8083}
   servlet:
     context-path: /api
 
@@ -90,3 +90,44 @@ management:
   endpoint:
     health:
       show-details: always
+
+# WebDiário Security Configuration
+"webdiario":
+  "security":
+    "resource-server": true
+    "cors":
+      enabled: true
+      allowed-origins: "*"
+      allowed-methods: GET,POST,PUT,DELETE,OPTIONS,PATCH,HEAD
+      allowed-headers: "*"
+      allow-credentials: true
+      exposed-headers: Authorization,Content-Type,X-Requested-With,Access-Control-Allow-Origin,Access-Control-Allow-Credentials
+      max-age: 3600
+    "tenant":
+      enabled: true
+      default-tenant: 1
+      tenant-header: "X-Tenant-ID"
+      validate-user-access: true
+    "audit":
+      enabled: true
+      log-login: true
+      log-logout: true
+      log-sensitive-operations: true
+      log-auth-failures: true
+
+  # Keycloak Configuration
+  "keycloak":
+    "enabled": true
+    "server-url": ${KEYCLOAK_SERVER_URL:https://keycloak.appwebdiario.com.br}
+    "realm": ${KEYCLOAK_REALM:master}
+    "client-id": ${OAUTH_CLIENT_ID:api-event-hub-client}
+    "client-secret": ${OAUTH_CLIENT_SECRET:DcfhBb0Ykbie00UlAoFxzSN82NdVIiWZ}
+    "app-name": ${OAUTH_APP_NAME:api-event-hub}
+    "organization":
+      "validate-user-access": true
+    "jwks":
+      "cache-enabled": true
+      "cache-ttl": 3600
+      "cache-refresh": 300
+      "max-retries": 3
+      "timeout": 5000

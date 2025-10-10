@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import br.com.tiagoramos.webdiario.security.starter.EnableWebdiarioSecurity;
+
 /**
  * Main application class for WebDiario Event Hub
  * Provides event processing, storage and distribution using RabbitMQ
@@ -16,6 +18,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableJpaRepositories("com.webdiario.eventhub.repository")
 @EnableAsync
 @EnableScheduling
+@EnableWebdiarioSecurity
 public class EventHubApplication {
 
     public static void main(String[] args) {

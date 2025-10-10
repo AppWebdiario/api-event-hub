@@ -47,6 +47,8 @@ Sistema centralizado para tratamento, validação, armazenamento e distribuiçã
 ### Tecnologias Utilizadas
 - **Spring Boot 3.2.0**: Framework base da aplicação
 - **Spring Data JPA**: Persistência de dados
+- **Spring Security + OAuth2**: Autenticação e autorização
+- **Keycloak**: Identity and Access Management
 - **MySQL 8.0**: Banco de dados principal
 - **Liquibase**: Migrações de banco de dados
 - **RabbitMQ**: Sistema de mensageria open source
@@ -84,6 +86,13 @@ spring.datasource.url=jdbc:mysql://localhost:3306/webdiario_event_hub
 spring.datasource.username=root
 spring.datasource.password=root
 
+# Keycloak / OAuth2 Configuration
+KEYCLOAK_SERVER_URL=https://keycloak.appwebdiario.com.br
+KEYCLOAK_REALM=master
+OAUTH_CLIENT_ID=api-event-hub-client
+OAUTH_CLIENT_SECRET=DcfhBb0Ykbie00UlAoFxzSN82NdVIiWZ
+OAUTH_APP_NAME=api-event-hub
+
 # RabbitMQ Configuration
 spring.rabbitmq.host=localhost
 spring.rabbitmq.port=5672
@@ -96,6 +105,31 @@ event-hub.retry-attempts=3
 event-hub.retry-delay=1000
 event-hub.event-retention-days=90
 ```
+
+### Configuração de Segurança com Keycloak
+
+A API Event Hub está integrada com Keycloak para autenticação e autorização OAuth2/JWT.
+
+**Credenciais do Cliente:**
+- **Client ID**: `api-event-hub-client`
+- **Client Secret**: `DcfhBb0Ykbie00UlAoFxzSN82NdVIiWZ`
+- **Realm**: `master`
+- **Server URL**: `https://keycloak.appwebdiario.com.br`
+
+**Funcionalidades Habilitadas:**
+- ✅ Autenticação via JWT Token
+- ✅ Validação automática de tokens
+- ✅ Multi-tenancy (Header `X-Tenant-ID`)
+- ✅ CORS configurável
+- ✅ Auditoria de acessos
+- ✅ Cache de JWKS
+
+**Endpoints Públicos (sem autenticação):**
+- `/actuator/**` - Health checks e métricas
+- `/swagger-ui/**` - Documentação Swagger
+- `/api-docs/**` - Especificação OpenAPI
+
+Para mais detalhes sobre a configuração do Keycloak, consulte [KEYCLOAK_CONFIGURATION.md](KEYCLOAK_CONFIGURATION.md).
 
 ### Configuração de Exchanges RabbitMQ
 ```yaml
@@ -267,7 +301,7 @@ List<Evento> eventos = eventoRepository.findByStatus(EventStatus.PROCESSED);
 
 // Por período
 List<Evento> eventos = eventoRepository.findByTimestampEventoBetween(
-    LocalDateTime.now().minusDays(7), 
+    LocalDateTime.now().minusDays(7),
     LocalDateTime.now()
 );
 
@@ -282,7 +316,7 @@ List<Evento> eventos = eventoRepository.findByTenantId("tenant1");
 ```java
 // Busca por conteúdo no payload ou metadata
 Page<Evento> eventos = eventoRepository.findByPayloadOrMetadataContaining(
-    "searchTerm", 
+    "searchTerm",
     PageRequest.of(0, 20)
 );
 
